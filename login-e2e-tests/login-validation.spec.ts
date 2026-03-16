@@ -10,25 +10,22 @@ test.describe("Login Page Tests", () => {
     loginPage = new LoginPage(page);
     await loginPage.navigateToLogin();
   });
-  test.afterEach(async ({ context }) => {
-    await context.clearCookies();
-  });
 
-  test("UserLogin_WithValidCredentials_ShouldSucceeds", async ({ page }) => {
+  test("UserLogin_WithValidCredentials_ShouldSucceed", async ({ page }) => {
     //Arrange & Act
     await loginPage.login(loginInfo.username, loginInfo.password);  
-    await loginPage.continueButton.click();
-     await Promise.all([
+    await Promise.all([
       page.waitForURL("**/home", {
         waitUntil: "domcontentloaded",
         timeout: 30000,
       }),
-      page.waitForLoadState("domcontentloaded"),
+      loginPage.continueButton.click()      
     ]);
 
     // Assertion
     await expect(page).toHaveURL(/\/home/);
-
+     // Logout after successful login     
+    await page.goto("/logout", { waitUntil: "commit" });    
   });
   test("UserLogin_WithInvalidEmailFormat_DisplaysErrorMessage", async () => {
     //Arrange & Act
@@ -48,7 +45,7 @@ test.describe("Login Page Tests", () => {
 
     await Promise.all([
       page.waitForResponse(res => 
-        res.url().includes("/login") && res.status() !== 200, // wait for failed auth response
+        res.url().includes("/login") && res.status() === 400, // wait for failed auth response
       ),
       loginPage.continueButton.click()
     ]);
@@ -63,7 +60,7 @@ test.describe("Login Page Tests", () => {
     await loginPage.continueButton.click();
     await loginPage.continueButton.click();
     //Assertion
-    await expect(loginPage.paswordErrorMessage).toContainText(
+    await expect(loginPage.passwordErrorMessage).toContainText(
       "Enter your password.",
     );
   });
@@ -71,8 +68,8 @@ test.describe("Login Page Tests", () => {
     //Arrange & Act
     await loginPage.continueButton.click();
     //Assertion
-    await expect(loginPage.emailmessage).toContainText(
-      "Enter an email address ",
+    await expect(loginPage.emailRequiredMessage).toContainText(
+      "Enter an email address",
     );
   });
   test("UserLogin_EditUsername_Functionality_ShouldSucceed", async ({ page }) => {
@@ -89,7 +86,7 @@ test.describe("Login Page Tests", () => {
         waitUntil: "domcontentloaded",
         timeout: 30000,
       }),
-      await loginPage.continueButton.click()      
+      loginPage.continueButton.click()      
     ]);
     // Assertion
     await expect(page).toHaveURL(/\/home/);

@@ -24,10 +24,10 @@ export class LoginPage {
   get emailErrorMessage() {
     return this.page.locator("#error-cs-email-invalid");
   }
-  get paswordErrorMessage() {
+  get passwordErrorMessage() {
     return this.page.locator("#error-cs-password-required");
   }
-  get emailmessage() {
+  get emailRequiredMessage() {
     return this.page.locator("#error-cs-username-required");
   }
   get editusernameLink() {
@@ -37,7 +37,7 @@ export class LoginPage {
     await this.usernameInput.waitFor({ state: 'visible' });
     await this.usernameInput.click();
     await this.usernameInput.fill(username);
-    
+
     await this.continueButton.click();
     
     await this.passwordInput.waitFor({ state: 'visible' });
